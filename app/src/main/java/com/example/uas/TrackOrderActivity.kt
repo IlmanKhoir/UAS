@@ -22,6 +22,13 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.net.HttpURLConnection
+import java.net.URL
+import org.json.JSONObject
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
 class TrackOrderActivity : AppCompatActivity() {
 
@@ -209,13 +216,8 @@ class TrackOrderActivity : AppCompatActivity() {
                 // userMarker.icon = ... // Use a different icon if available
                 mapView.overlays.add(userMarker)
 
-                // Draw Line
-                val line = Polyline()
-                line.addPoint(storeLocation)
-                line.addPoint(userLocation)
-                line.outlinePaint.color = ContextCompat.getColor(this, R.color.purple_500)
-                line.outlinePaint.strokeWidth = 5.0f
-                mapView.overlays.add(line)
+                // Draw Route
+                drawRoute(storeLocation, userLocation)
                 
                 mapView.invalidate()
             } else {
@@ -232,5 +234,65 @@ class TrackOrderActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         mapView.onPause()
+    }
+    private fun drawRoute(start: GeoPoint, end: GeoPoint) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val routePoints = getOSRMRoute(start, end)
+            withContext(Dispatchers.Main) {
+                if (routePoints.isNotEmpty()) {
+                    val line = Polyline()
+                    line.setPoints(routePoints)
+                    line.outlinePaint.color = ContextCompat.getColor(this@TrackOrderActivity, R.color.purple_500)
+                    line.outlinePaint.strokeWidth = 5.0f
+                    mapView.overlays.add(line)
+                } else {
+                    // Fallback to straight line
+                    val line = Polyline()
+                    line.addPoint(start)
+                    line.addPoint(end)
+                    line.outlinePaint.color = ContextCompat.getColor(this@TrackOrderActivity, R.color.purple_500)
+                    line.outlinePaint.strokeWidth = 5.0f
+                    mapView.overlays.add(line)
+                }
+                mapView.invalidate()
+            }
+        }
+    }
+
+    private fun getOSRMRoute(start: GeoPoint, end: GeoPoint): List<GeoPoint> {
+        val urlString = "http://router.project-osrm.org/route/v1/driving/${start.longitude},${start.latitude};${end.longitude},${end.latitude}?overview=full&geometries=geojson"
+        try {
+            val url = URL(urlString)
+            val connection = url.openConnection() as HttpURLConnection
+            connection.requestMethod = "GET"
+            connection.connect()
+
+            if (connection.responseCode == 200) {
+                val reader = BufferedReader(InputStreamReader(connection.inputStream))
+                val response = StringBuilder()
+                var line: String?
+                while (reader.readLine().also { line = it } != null) {
+                    response.append(line)
+                }
+                reader.close()
+                
+                val jsonResponse = JSONObject(response.toString())
+                val routes = jsonResponse.getJSONArray("routes")
+                if (routes.length() > 0) {
+                    val geometry = routes.getJSONObject(0).getJSONObject("geometry")
+                    val coordinates = geometry.getJSONArray("coordinates")
+                    
+                    val points = ArrayList<GeoPoint>()
+                    for (i in 0 until coordinates.length()) {
+                        val coord = coordinates.getJSONArray(i)
+                        points.add(GeoPoint(coord.getDouble(1), coord.getDouble(0)))
+                    }
+                    return points
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return emptyList()
     }
 }
