@@ -10,7 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.uas.adapter.OrderAdapter
-import com.example.uas.data.ProductRepository
+
 import kotlinx.coroutines.launch
 
 class OrderFragment : Fragment() {
@@ -41,7 +41,7 @@ class OrderFragment : Fragment() {
                         id = entity.id.toString(),
                         date = java.util.Date(entity.order_date),
                         totalAmount = entity.total_amount.toDouble(),
-                        status = try { com.example.uas.model.OrderStatus.valueOf(entity.status.uppercase()) } catch (e: Exception) { com.example.uas.model.OrderStatus.PLACED },
+                        status = try { com.example.uas.model.OrderStatus.valueOf(entity.status.uppercase()) } catch (_: Exception) { com.example.uas.model.OrderStatus.PLACED },
                         items = emptyList() // We simplified items for now, or parse JSON if needed
                     )
                 }

@@ -82,7 +82,7 @@ class CategoryActivity : AppCompatActivity() {
                             val updatedWishlist = db.wishlistDao().getWishlistByUserId(userId)
                             val updatedIds = updatedWishlist.map { it.product_id }.toSet()
                             adapter.updateWishlist(updatedIds)
-                        } catch (e: Exception) {
+                        } catch (_: Exception) {
                             Toast.makeText(this@CategoryActivity, "Error updating wishlist", Toast.LENGTH_SHORT).show()
                         }
                     }

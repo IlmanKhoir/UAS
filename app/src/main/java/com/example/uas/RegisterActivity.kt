@@ -153,7 +153,7 @@ class RegisterActivity : AppCompatActivity() {
                                     val address = addresses[0].getAddressLine(0)
                                     etAddress.setText(address)
                                 } else {
-                                    etAddress.setText("Lat: ${location.latitude}, Long: ${location.longitude}")
+                                    etAddress.setText(getString(R.string.lat_long_format, location.latitude, location.longitude))
                                 }
                             }
                         }
@@ -165,11 +165,11 @@ class RegisterActivity : AppCompatActivity() {
                                 val address = addresses[0].getAddressLine(0)
                                 etAddress.setText(address)
                             } else {
-                                etAddress.setText("Lat: ${location.latitude}, Long: ${location.longitude}")
+                                etAddress.setText(getString(R.string.lat_long_format, location.latitude, location.longitude))
                             }
                         } catch (e: Exception) {
-                            etAddress.setText("Lat: ${location.latitude}, Long: ${location.longitude}")
-                            Toast.makeText(this, "Error getting address: ${e.message}", Toast.LENGTH_SHORT).show()
+                            etAddress.setText(getString(R.string.lat_long_format, location.latitude, location.longitude))
+                            Toast.makeText(this, getString(R.string.error_getting_address, e.message), Toast.LENGTH_SHORT).show()
                         }
                     }
                 } else {

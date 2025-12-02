@@ -23,7 +23,7 @@ class PaymentActivity : AppCompatActivity() {
         val totalAmount = intent.getDoubleExtra("TOTAL_AMOUNT", 0.0)
 
         val tvPaymentTotal = findViewById<TextView>(R.id.tvPaymentTotal)
-        tvPaymentTotal.text = String.format("$%.2f", totalAmount)
+        tvPaymentTotal.text = String.format(java.util.Locale.US, "$%.2f", totalAmount)
 
         val rgPaymentMethod = findViewById<RadioGroup>(R.id.rgPaymentMethod)
         val layoutCreditCard = findViewById<LinearLayout>(R.id.layoutCreditCard)

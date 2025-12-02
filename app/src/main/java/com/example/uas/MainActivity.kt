@@ -1,6 +1,6 @@
 package com.example.uas
 
-import android.content.Intent
+
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 
@@ -12,6 +12,8 @@ class MainActivity : AppCompatActivity() {
         // Temporary: Auto-launch Register for testing if needed, or add a button.
         // For now, let's add a button in the layout.
 
+        val navView = findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(R.id.nav_view)
+        
         // Initialize with HomeFragment or requested fragment
         if (savedInstanceState == null) {
             val navigateTo = intent.getStringExtra("NAVIGATE_TO")
@@ -19,7 +21,7 @@ class MainActivity : AppCompatActivity() {
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.fragment_container, OrderFragment())
                     .commit()
-                findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(R.id.nav_view).selectedItemId = R.id.navigation_orders
+                navView.selectedItemId = R.id.navigation_orders
             } else {
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.fragment_container, HomeFragment())
@@ -27,7 +29,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        val navView = findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(R.id.nav_view)
         navView.setOnItemSelectedListener { item ->
             val fragment = when (item.itemId) {
                 R.id.navigation_home -> HomeFragment()

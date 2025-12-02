@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import com.example.uas.util.SessionManager
+import androidx.core.net.toUri
 
 class ProfileFragment : Fragment() {
 
@@ -98,8 +99,8 @@ class ProfileFragment : Fragment() {
                     
                     if (user.profile_picture_uri != null) {
                         try {
-                            ivProfileImage.setImageURI(android.net.Uri.parse(user.profile_picture_uri))
-                        } catch (e: Exception) {
+                            ivProfileImage.setImageURI(user.profile_picture_uri.toUri())
+                        } catch (_: Exception) {
                             // Ignore
                         }
                     }

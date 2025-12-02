@@ -1,6 +1,6 @@
 package com.example.uas
 
-import android.content.Intent
+
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.example.uas.data.ProductRepository
+import androidx.core.graphics.toColorInt
 
 
 import androidx.lifecycle.lifecycleScope
@@ -44,7 +45,7 @@ class DetailActivity : AppCompatActivity() {
         val ivDetailFavorite = findViewById<ImageView>(R.id.ivDetailFavorite)
 
         tvDetailName.text = product.name
-        tvDetailPrice.text = "$${product.price}"
+        tvDetailPrice.text = getString(R.string.price_format, product.price)
         tvDetailDescription.text = product.description
 
         Glide.with(this)
@@ -87,7 +88,7 @@ class DetailActivity : AppCompatActivity() {
                             updateFavoriteIcon(ivDetailFavorite, true)
                             Toast.makeText(this@DetailActivity, "Added to Wishlist", Toast.LENGTH_SHORT).show()
                         }
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                         Toast.makeText(this@DetailActivity, "Error updating wishlist", Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -97,9 +98,9 @@ class DetailActivity : AppCompatActivity() {
 
     private fun updateFavoriteIcon(imageView: ImageView, isFavorite: Boolean) {
         if (isFavorite) {
-            imageView.setColorFilter(android.graphics.Color.parseColor("#F44336")) // Red
+            imageView.setColorFilter("#F44336".toColorInt()) // Red
         } else {
-            imageView.setColorFilter(android.graphics.Color.parseColor("#BDBDBD")) // Grey
+            imageView.setColorFilter("#BDBDBD".toColorInt()) // Grey
         }
     }
 }

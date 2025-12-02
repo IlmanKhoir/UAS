@@ -29,4 +29,24 @@
     <string name="step_3_desc">Order Delivered</string>
     <string name="driver_image_desc">Driver Image</string>
     <string name="help_icon_desc">Help</string>
+    <string name="price_format">$%1$.2f</string>
+
+    <!-- Track Order Dynamic -->
+    <string name="track_order_header">Track Order #%1$s</string>
+    <string name="status_header">Status: %1$s</string>
+    <string name="status_placed">PLACED</string>
+    <string name="status_packed">PACKED</string>
+    <string name="status_shipped">SHIPPED</string>
+    <string name="status_delivered">DELIVERED</string>
+    <string name="status_cancelled">CANCELLED</string>
+    <string name="store_location_title">Store Location</string>
+    <string name="user_location_title">Your Location</string>
+    <string name="unable_to_get_location">Unable to get current location</string>
+    <string name="category_name">Category Name</string>
+    <string name="login">Login</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="don_t_have_an_account_register">Don\'t have an account? Register</string>
+    <string name="my_orders">My Orders</string>
+    <string name="lat_long_format">Lat: %1$f, Long: %2$f</string>
 </resources>

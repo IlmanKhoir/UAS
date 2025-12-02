@@ -27,7 +27,9 @@ class TrackOrderActivity : AppCompatActivity() {
 
     private lateinit var mapView: MapView
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private val LOCATION_PERMISSION_REQUEST_CODE = 1
+    companion object {
+        private const val LOCATION_PERMISSION_REQUEST_CODE = 1
+    }
 
     // Dummy Store Location (e.g., Central Jakarta)
     private val storeLocation = GeoPoint(-6.1751, 106.8650) 
@@ -72,7 +74,7 @@ class TrackOrderActivity : AppCompatActivity() {
                             id = entity.id.toString(),
                             date = java.util.Date(entity.order_date),
                             totalAmount = entity.total_amount.toDouble(),
-                            status = try { OrderStatus.valueOf(entity.status.uppercase()) } catch (e: Exception) { OrderStatus.PLACED },
+                            status = try { OrderStatus.valueOf(entity.status.uppercase()) } catch (_: Exception) { OrderStatus.PLACED },
                             items = emptyList() // Simplified
                         )
                     }
@@ -86,8 +88,8 @@ class TrackOrderActivity : AppCompatActivity() {
 
             val tvTrackingTitle = findViewById<TextView>(R.id.tvTrackingTitle)
             val tvTrackingStatus = findViewById<TextView>(R.id.tvTrackingStatus)
-            tvTrackingTitle.text = "Track Order #${order.id}"
-            tvTrackingStatus.text = "Status: ${order.status}"
+            tvTrackingTitle.text = getString(R.string.track_order_header, order.id)
+            tvTrackingStatus.text = getString(R.string.status_header, order.status)
 
             // Update Timeline
             val ivStep1 = findViewById<android.widget.ImageView>(R.id.ivStep1)
@@ -113,13 +115,13 @@ class TrackOrderActivity : AppCompatActivity() {
             when (order.status) {
                 OrderStatus.PLACED -> {
                     ivStep1.background.setTint(purple)
-                    tvTrackingStatus.text = "PLACED"
+                    tvTrackingStatus.text = getString(R.string.status_placed)
                 }
                 OrderStatus.PACKED -> {
                     ivStep1.background.setTint(purple)
                     viewLine1.setBackgroundColor(purple)
                     ivStep2.background.setTint(purple)
-                    tvTrackingStatus.text = "PACKED"
+                    tvTrackingStatus.text = getString(R.string.status_packed)
                 }
                 OrderStatus.SHIPPED -> {
                     ivStep1.background.setTint(purple)
@@ -127,7 +129,7 @@ class TrackOrderActivity : AppCompatActivity() {
                     ivStep2.background.setTint(purple)
                     viewLine2.setBackgroundColor(purple)
                     ivStep3.background.setTint(purple)
-                    tvTrackingStatus.text = "SHIPPED"
+                    tvTrackingStatus.text = getString(R.string.status_shipped)
                 }
                 OrderStatus.DELIVERED -> {
                     ivStep1.background.setTint(purple)
@@ -135,10 +137,10 @@ class TrackOrderActivity : AppCompatActivity() {
                     ivStep2.background.setTint(purple)
                     viewLine2.setBackgroundColor(purple)
                     ivStep3.background.setTint(purple)
-                    tvTrackingStatus.text = "DELIVERED"
+                    tvTrackingStatus.text = getString(R.string.status_delivered)
                 }
                 OrderStatus.CANCELLED -> {
-                    tvTrackingStatus.text = "CANCELLED"
+                    tvTrackingStatus.text = getString(R.string.status_cancelled)
                     tvTrackingStatus.background.setTint(ContextCompat.getColor(this@TrackOrderActivity, R.color.red_error))
                 }
             }
@@ -166,7 +168,7 @@ class TrackOrderActivity : AppCompatActivity() {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 setupMapWithLocation()
             } else {
-                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.permission_denied), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -195,15 +197,15 @@ class TrackOrderActivity : AppCompatActivity() {
                 val storeMarker = Marker(mapView)
                 storeMarker.position = storeLocation
                 storeMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                storeMarker.title = "Store Location"
-                storeMarker.icon = ContextCompat.getDrawable(this, org.osmdroid.library.R.drawable.marker_default) // Or custom icon
+                storeMarker.title = getString(R.string.store_location_title)
+                storeMarker.icon = ContextCompat.getDrawable(this, R.drawable.ic_store_location)
                 mapView.overlays.add(storeMarker)
 
                 // Marker for User
                 val userMarker = Marker(mapView)
                 userMarker.position = userLocation
                 userMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                userMarker.title = "Your Location"
+                userMarker.title = getString(R.string.user_location_title)
                 // userMarker.icon = ... // Use a different icon if available
                 mapView.overlays.add(userMarker)
 
@@ -217,7 +219,7 @@ class TrackOrderActivity : AppCompatActivity() {
                 
                 mapView.invalidate()
             } else {
-                Toast.makeText(this, "Unable to get current location", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.unable_to_get_location), Toast.LENGTH_SHORT).show()
             }
         }
     }

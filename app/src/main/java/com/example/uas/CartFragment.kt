@@ -40,6 +40,7 @@ class CartFragment : Fragment() {
         adapter = CartAdapter(ProductRepository.getCartItems()) { cartItem ->
             ProductRepository.removeFromCart(cartItem.product)
             updateCart()
+            @Suppress("NotifyDataSetChanged")
             adapter.notifyDataSetChanged()
         }
         rvCartItems.adapter = adapter
@@ -57,12 +58,13 @@ class CartFragment : Fragment() {
 
     private fun updateCart() {
         val total = ProductRepository.getCartTotal()
-        tvCartTotal.text = String.format("$%.2f", total)
+        tvCartTotal.text = String.format(java.util.Locale.US, "$%.2f", total)
     }
     
     override fun onResume() {
         super.onResume()
         if (::adapter.isInitialized) {
+            @Suppress("NotifyDataSetChanged")
             adapter.notifyDataSetChanged()
             updateCart()
         }

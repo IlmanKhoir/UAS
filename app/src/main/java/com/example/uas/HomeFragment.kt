@@ -41,7 +41,7 @@ class HomeFragment : Fragment() {
             Category("All", R.drawable.tool),
             Category("Electronics", R.drawable.icons8electronics100),
             Category("Fashion", R.drawable.iconfashion),
-            // Category("Home", R.drawable.iconshome), // Removed as requested
+            // Category("Home", R.drawable.icon_home), // Removed as requested
             Category("Beauty", R.drawable.iconslipstick),
             Category("Sports", R.drawable.iconsports)
         )
@@ -70,7 +70,7 @@ class HomeFragment : Fragment() {
 
         val adapter = ProductAdapter(
             products, 
-            emptySet<Int>(),
+            emptySet(),
             onProductClick = { product ->
                 val intent = Intent(requireContext(), DetailActivity::class.java)
                 intent.putExtra("PRODUCT_ID", product.id)
@@ -95,7 +95,7 @@ class HomeFragment : Fragment() {
                             val updatedWishlist = db.wishlistDao().getWishlistByUserId(userId)
                             val updatedIds = updatedWishlist.map { it.product_id }.toSet()
                             (rvProducts.adapter as? ProductAdapter)?.updateWishlist(updatedIds)
-                        } catch (e: android.database.sqlite.SQLiteConstraintException) {
+                        } catch (_: android.database.sqlite.SQLiteConstraintException) {
                             Toast.makeText(requireContext(), "Error: User not found. Please login again.", Toast.LENGTH_LONG).show()
                             sessionManager.logout()
                             // Optional: Redirect to login

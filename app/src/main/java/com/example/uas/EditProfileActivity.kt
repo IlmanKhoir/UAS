@@ -1,6 +1,8 @@
 package com.example.uas
 
 import android.net.Uri
+import android.os.Build
+import androidx.core.net.toUri
 import android.os.Bundle
 import android.Manifest
 import android.content.pm.PackageManager
@@ -43,7 +45,7 @@ class EditProfileActivity : AppCompatActivity() {
             val flag = android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
             try {
                 contentResolver.takePersistableUriPermission(uri, flag)
-            } catch (e: SecurityException) {
+            } catch (_: SecurityException) {
                 // Handle exception if permission cannot be taken
             }
         }
@@ -112,10 +114,10 @@ class EditProfileActivity : AppCompatActivity() {
                 
                 if (user.profile_picture_uri != null) {
                     try {
-                        val uri = Uri.parse(user.profile_picture_uri)
+                        val uri = user.profile_picture_uri.toUri()
                         ivProfileImage.setImageURI(uri)
                         selectedImageUri = uri
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                         // Failed to load image
                     }
                 }
@@ -190,10 +192,22 @@ class EditProfileActivity : AppCompatActivity() {
                 if (location != null) {
                     try {
                         val geocoder = Geocoder(this, Locale.getDefault())
-                        val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
-                        if (addresses != null && addresses.isNotEmpty()) {
-                            val address = addresses[0].getAddressLine(0)
-                            etAddress.setText(address)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            geocoder.getFromLocation(location.latitude, location.longitude, 1) { addresses ->
+                                if (addresses.isNotEmpty()) {
+                                    val address = addresses[0].getAddressLine(0)
+                                    runOnUiThread {
+                                        etAddress.setText(address)
+                                    }
+                                }
+                            }
+                        } else {
+                            @Suppress("DEPRECATION")
+                            val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+                            if (addresses != null && addresses.isNotEmpty()) {
+                                val address = addresses[0].getAddressLine(0)
+                                etAddress.setText(address)
+                            }
                         }
                     } catch (e: Exception) {
                         Toast.makeText(this, getString(R.string.error_getting_address, e.message), Toast.LENGTH_SHORT).show()
