@@ -1,3 +1,32 @@
 <resources>
     <string name="app_name">UAS</string>
+    
+    <!-- Edit Profile -->
+    <string name="edit_profile_title">Edit Profile</string>
+    <string name="full_name_hint">Full Name</string>
+    <string name="email_hint">Email</string>
+    <string name="phone_number_hint">Phone Number</string>
+    <string name="address_hint">Address</string>
+    <string name="save_changes_button">Save Changes</string>
+    <string name="profile_image_desc">Profile Image</string>
+    <string name="add_icon_desc">Add Icon</string>
+    <string name="select_image_desc">Select Image</string>
+    <string name="get_location_button">Get Current Location</string>
+    <string name="permission_denied">Permission denied</string>
+    <string name="error_getting_address">Error getting address: %1$s</string>
+    <string name="location_not_found">Location not found. Make sure GPS is enabled.</string>
+    <string name="profile_updated">Profile Updated</string>
+    <string name="name_cannot_be_empty">Name cannot be empty</string>
+
+    <!-- Track Order -->
+    <string name="track_order_title">Track Order</string>
+    <string name="order_number_placeholder">Order #12345</string>
+    <string name="arriving_status_placeholder">Arriving in 15 mins</string>
+    <string name="driver_name_placeholder">Budi Santoso</string>
+    <string name="driver_vehicle_placeholder">Honda Beat - B 1234 ABC</string>
+    <string name="step_1_desc">Order Placed</string>
+    <string name="step_2_desc">Order Prepared</string>
+    <string name="step_3_desc">Order Delivered</string>
+    <string name="driver_image_desc">Driver Image</string>
+    <string name="help_icon_desc">Help</string>
 </resources>

@@ -10,6 +10,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import com.example.uas.util.SessionManager
 
 class ProfileFragment : Fragment() {
@@ -19,6 +21,7 @@ class ProfileFragment : Fragment() {
     private lateinit var layoutLoggedOut: LinearLayout
     private lateinit var tvUserName: TextView
     private lateinit var tvUserEmail: TextView
+    private lateinit var ivProfileImage: android.widget.ImageView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,6 +39,9 @@ class ProfileFragment : Fragment() {
         layoutLoggedOut = view.findViewById(R.id.layoutLoggedOut)
         tvUserName = view.findViewById(R.id.tvUserName)
         tvUserEmail = view.findViewById(R.id.tvUserEmail)
+        
+        val cardView = view.findViewById<androidx.cardview.widget.CardView>(R.id.cvProfileImage)
+        ivProfileImage = cardView.getChildAt(0) as android.widget.ImageView
 
         // Logged Out Buttons
         view.findViewById<Button>(R.id.btnLogin).setOnClickListener {
@@ -64,6 +70,10 @@ class ProfileFragment : Fragment() {
         view.findViewById<View>(R.id.btnHelp).setOnClickListener {
             Toast.makeText(requireContext(), "Contact support at support@example.com", Toast.LENGTH_LONG).show()
         }
+
+        view.findViewById<View>(R.id.btnEditProfile).setOnClickListener {
+            startActivity(Intent(requireContext(), EditProfileActivity::class.java))
+        }
     }
 
     override fun onResume() {
@@ -77,6 +87,25 @@ class ProfileFragment : Fragment() {
             layoutLoggedOut.visibility = View.GONE
             tvUserName.text = sessionManager.getUserName()
             tvUserEmail.text = sessionManager.getUserEmail()
+            
+            // Load fresh data from DB including image
+            lifecycleScope.launch {
+                val db = com.example.uas.data.local.AppDatabase.getDatabase(requireContext())
+                val user = db.userDao().getUserById(sessionManager.getUserId())
+                if (user != null) {
+                    tvUserName.text = user.name
+                    tvUserEmail.text = user.email
+                    
+                    if (user.profile_picture_uri != null) {
+                        try {
+                            ivProfileImage.setImageURI(android.net.Uri.parse(user.profile_picture_uri))
+                        } catch (e: Exception) {
+                            // Ignore
+                        }
+                    }
+                }
+            }
+
         } else {
             layoutLoggedIn.visibility = View.GONE
             layoutLoggedOut.visibility = View.VISIBLE

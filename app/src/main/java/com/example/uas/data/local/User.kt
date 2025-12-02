@@ -11,5 +11,6 @@ data class User(
     val phone: String?,
     val password_hash: String,
     val created_at: Long = System.currentTimeMillis(),
-    val address: String?
+    val address: String?,
+    val profile_picture_uri: String? = null
 )

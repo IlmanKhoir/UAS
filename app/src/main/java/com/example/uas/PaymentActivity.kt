@@ -89,6 +89,18 @@ class PaymentActivity : AppCompatActivity() {
 
             lifecycleScope.launch {
                 val db = com.example.uas.data.local.AppDatabase.getDatabase(applicationContext)
+                
+                // Verify user exists first (in case of DB reset)
+                val user = db.userDao().getUserById(userId)
+                if (user == null) {
+                    // User ID in session but not in DB. Clear session and logout.
+                    sessionManager.logout()
+                    Toast.makeText(this@PaymentActivity, "Session expired. Please login again.", Toast.LENGTH_LONG).show()
+                    startActivity(Intent(this@PaymentActivity, LoginActivity::class.java))
+                    finish()
+                    return@launch
+                }
+
                 val order = com.example.uas.data.local.OrderEntity(
                     user_id = userId,
                     total_amount = total.toInt(),
@@ -99,7 +111,16 @@ class PaymentActivity : AppCompatActivity() {
                     items_json = itemsString
                 )
                 db.orderDao().insertOrder(order)
+                
+                // Continue with navigation only after successful DB op
+                ProductRepository.placeOrder()
+                val intent = Intent(this@PaymentActivity, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                intent.putExtra("NAVIGATE_TO", "ORDERS")
+                startActivity(intent)
+                finish()
             }
+            return // Return here to wait for coroutine
         }
 
         // Create Order (Legacy/In-Memory)

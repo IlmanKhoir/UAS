@@ -41,7 +41,7 @@ class HomeFragment : Fragment() {
             Category("All", R.drawable.tool),
             Category("Electronics", R.drawable.icons8electronics100),
             Category("Fashion", R.drawable.iconfashion),
-            Category("Home", R.drawable.iconshome),
+            // Category("Home", R.drawable.iconshome), // Removed as requested
             Category("Beauty", R.drawable.iconslipstick),
             Category("Sports", R.drawable.iconsports)
         )
@@ -51,7 +51,6 @@ class HomeFragment : Fragment() {
             startActivity(intent)
         }
 
-        // Setup Products
         // Setup User Name
         val sessionManager = SessionManager(requireContext())
         val tvGreeting = view.findViewById<TextView>(R.id.tvGreeting)
@@ -109,6 +108,22 @@ class HomeFragment : Fragment() {
             }
         )
         rvProducts.adapter = adapter
+
+        // Setup Search
+        val etSearch = view.findViewById<android.widget.EditText>(R.id.etSearch)
+        etSearch.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val query = s.toString().lowercase()
+                val filteredProducts = products.filter {
+                    it.name.lowercase().contains(query)
+                }
+                adapter.updateProducts(filteredProducts)
+            }
+
+            override fun afterTextChanged(s: android.text.Editable?) {}
+        })
 
         // Load initial wishlist state
         if (userId != -1) {

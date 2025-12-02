@@ -116,6 +116,8 @@
             android:clipToPadding="false"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
+
+
         <!-- Popular Products Section -->
         <LinearLayout
             android:layout_width="match_parent"

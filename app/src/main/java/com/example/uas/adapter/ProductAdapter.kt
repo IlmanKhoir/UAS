@@ -11,7 +11,7 @@ import com.example.uas.R
 import com.example.uas.model.Product
 
 class ProductAdapter(
-    private val products: List<Product>,
+    private var products: List<Product>,
     private var wishlistProductIds: Set<Int> = emptySet(),
     private val onProductClick: (Product) -> Unit,
     private val onFavoriteClick: (Product) -> Unit
@@ -59,6 +59,11 @@ class ProductAdapter(
 
     fun updateWishlist(newWishlist: Set<Int>) {
         wishlistProductIds = newWishlist
+        notifyDataSetChanged()
+    }
+
+    fun updateProducts(newProducts: List<Product>) {
+        products = newProducts
         notifyDataSetChanged()
     }
 

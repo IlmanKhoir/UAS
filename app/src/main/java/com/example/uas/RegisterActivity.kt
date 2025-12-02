@@ -22,6 +22,19 @@ class RegisterActivity : AppCompatActivity() {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var etAddress: TextInputEditText
+    private lateinit var ivProfileImage: android.widget.ImageView
+    private var selectedImageUri: android.net.Uri? = null
+
+    private val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) {
+            selectedImageUri = uri
+            ivProfileImage.setImageURI(uri)
+            
+            // Persist permission
+            val flag = android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+            contentResolver.takePersistableUriPermission(uri, flag)
+        }
+    }
 
     private val requestPermissionLauncher =
         registerForActivityResult(
@@ -42,9 +55,22 @@ class RegisterActivity : AppCompatActivity() {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         etAddress = findViewById(R.id.etAddress)
+        ivProfileImage = findViewById(R.id.ivProfileImage)
+
+        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+        toolbar.setNavigationOnClickListener {
+            finish()
+        }
 
         val btnGetLocation = findViewById<Button>(R.id.btnGetLocation)
         val btnRegister = findViewById<Button>(R.id.btnRegister)
+        val btnSelectImage = findViewById<android.view.View>(R.id.btnSelectImage)
+
+        btnSelectImage.setOnClickListener {
+            pickMedia.launch(androidx.activity.result.PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        }
 
         btnGetLocation.setOnClickListener {
             checkLocationPermission()
@@ -73,7 +99,8 @@ class RegisterActivity : AppCompatActivity() {
                         name = name,
                         password_hash = password, // Note: In production, hash this!
                         address = address,
-                        phone = "" // Add phone field if needed
+                        phone = "", // Add phone field if needed
+                        profile_picture_uri = selectedImageUri?.toString()
                     )
                     db.userDao().insertUser(newUser)
                     Toast.makeText(this@RegisterActivity, "Registration Successful!", Toast.LENGTH_SHORT).show()

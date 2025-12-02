@@ -36,6 +36,7 @@
         <activity android:name=".TrackOrderActivity" />
         <activity android:name=".WishlistActivity" />
         <activity android:name=".CategoryActivity" />
+        <activity android:name=".EditProfileActivity" />
     </application>
 
 </manifest>

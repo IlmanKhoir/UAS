@@ -44,12 +44,8 @@ class OrderActivity : AppCompatActivity() {
                 rvOrders.adapter = adapter
             }
         } else {
-            // Fallback to mock data or empty
-            val adapter = OrderAdapter(ProductRepository.getOrders()) { order ->
-                val intent = Intent(this, TrackOrderActivity::class.java)
-                intent.putExtra("ORDER_ID", order.id)
-                startActivity(intent)
-            }
+            // Not logged in, show empty list
+            val adapter = OrderAdapter(emptyList()) { _ -> }
             rvOrders.adapter = adapter
         }
     }

@@ -14,4 +14,7 @@ interface UserDao {
 
     @Query("SELECT * FROM users WHERE id = :userId")
     suspend fun getUserById(userId: Int): User?
+
+    @androidx.room.Update
+    suspend fun updateUser(user: User)
 }
