@@ -237,7 +237,15 @@ class TrackOrderActivity : AppCompatActivity() {
     }
     private fun drawRoute(start: GeoPoint, end: GeoPoint) {
         lifecycleScope.launch(Dispatchers.IO) {
-            val routePoints = getOSRMRoute(start, end)
+            var routePoints: List<GeoPoint> = emptyList()
+            var errorMessage = ""
+            
+            try {
+                routePoints = getOSRMRoute(start, end)
+            } catch (e: Exception) {
+                errorMessage = e.message ?: "Unknown error"
+            }
+
             withContext(Dispatchers.Main) {
                 if (routePoints.isNotEmpty()) {
                     val line = Polyline()
@@ -253,6 +261,11 @@ class TrackOrderActivity : AppCompatActivity() {
                     line.outlinePaint.color = ContextCompat.getColor(this@TrackOrderActivity, R.color.purple_500)
                     line.outlinePaint.strokeWidth = 5.0f
                     mapView.overlays.add(line)
+                    
+                    // Show debug info
+                    if (errorMessage.isNotEmpty()) {
+                        Toast.makeText(this@TrackOrderActivity, "Routing failed: $errorMessage", Toast.LENGTH_LONG).show()
+                    }
                 }
                 mapView.invalidate()
             }
@@ -260,39 +273,45 @@ class TrackOrderActivity : AppCompatActivity() {
     }
 
     private fun getOSRMRoute(start: GeoPoint, end: GeoPoint): List<GeoPoint> {
-        val urlString = "http://router.project-osrm.org/route/v1/driving/${start.longitude},${start.latitude};${end.longitude},${end.latitude}?overview=full&geometries=geojson"
-        try {
-            val url = URL(urlString)
-            val connection = url.openConnection() as HttpURLConnection
-            connection.requestMethod = "GET"
-            connection.connect()
+        val urlString = "https://router.project-osrm.org/route/v1/driving/${start.longitude},${start.latitude};${end.longitude},${end.latitude}?overview=full&geometries=geojson"
+        
+        val url = URL(urlString)
+        val connection = url.openConnection() as HttpURLConnection
+        connection.requestMethod = "GET"
+        connection.setRequestProperty("User-Agent", "UASApp/1.0")
+        connection.connect()
 
-            if (connection.responseCode == 200) {
-                val reader = BufferedReader(InputStreamReader(connection.inputStream))
-                val response = StringBuilder()
-                var line: String?
-                while (reader.readLine().also { line = it } != null) {
-                    response.append(line)
-                }
-                reader.close()
-                
-                val jsonResponse = JSONObject(response.toString())
-                val routes = jsonResponse.getJSONArray("routes")
-                if (routes.length() > 0) {
-                    val geometry = routes.getJSONObject(0).getJSONObject("geometry")
-                    val coordinates = geometry.getJSONArray("coordinates")
-                    
-                    val points = ArrayList<GeoPoint>()
-                    for (i in 0 until coordinates.length()) {
-                        val coord = coordinates.getJSONArray(i)
-                        points.add(GeoPoint(coord.getDouble(1), coord.getDouble(0)))
-                    }
-                    return points
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
+        val responseCode = connection.responseCode
+        if (responseCode != 200) {
+            throw Exception("Server Error: $responseCode")
         }
-        return emptyList()
+
+        val reader = BufferedReader(InputStreamReader(connection.inputStream))
+        val response = StringBuilder()
+        var line: String?
+        while (reader.readLine().also { line = it } != null) {
+            response.append(line)
+        }
+        reader.close()
+        
+        val jsonResponse = JSONObject(response.toString())
+        if (!jsonResponse.has("routes")) {
+             throw Exception("Invalid JSON response")
+        }
+        
+        val routes = jsonResponse.getJSONArray("routes")
+        if (routes.length() > 0) {
+            val geometry = routes.getJSONObject(0).getJSONObject("geometry")
+            val coordinates = geometry.getJSONArray("coordinates")
+            
+            val points = ArrayList<GeoPoint>()
+            for (i in 0 until coordinates.length()) {
+                val coord = coordinates.getJSONArray(i)
+                points.add(GeoPoint(coord.getDouble(1), coord.getDouble(0)))
+            }
+            return points
+        } else {
+            throw Exception("No route found (Too far/No road)")
+        }
     }
 }
