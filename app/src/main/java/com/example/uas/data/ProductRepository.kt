@@ -11,7 +11,7 @@ object ProductRepository {
             "Wireless Headphones",
             "Premium noise-cancelling wireless headphones with 30-hour battery life.",
             199.99,
-            "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1000&auto=format&fit=crop",
+            "android.resource://com.example.uas/drawable/wirelessheadphone",
             "Electronics"
         ),
         Product(
@@ -19,7 +19,7 @@ object ProductRepository {
             "Smart Watch",
             "Fitness tracker with heart rate monitor and GPS.",
             149.50,
-            "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop",
+            "android.resource://com.example.uas/drawable/smartwatch",
             "Electronics"
         ),
         Product(
@@ -27,7 +27,7 @@ object ProductRepository {
             "Running Shoes",
             "Lightweight running shoes for daily training.",
             89.99,
-            "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop",
+            "android.resource://com.example.uas/drawable/sepatulari",
             "Sports"
         ),
         Product(
@@ -35,7 +35,7 @@ object ProductRepository {
             "Backpack",
             "Durable backpack with laptop compartment.",
             49.99,
-            "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=1000&auto=format&fit=crop",
+            "android.resource://com.example.uas/drawable/tas",
             "Fashion"
         ),
         Product(
@@ -43,7 +43,7 @@ object ProductRepository {
             "Sunglasses",
             "Classic aviator sunglasses with UV protection.",
             120.00,
-            "https://images.unsplash.com/photo-1572635196237-14b3f281503f?q=80&w=1000&auto=format&fit=crop",
+            "android.resource://com.example.uas/drawable/kacamata",
             "Fashion"
         ),
         Product(
@@ -51,7 +51,7 @@ object ProductRepository {
             "Gaming Mouse",
             "High-precision gaming mouse with RGB lighting.",
             59.99,
-            "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?q=80&w=1000&auto=format&fit=crop",
+            "android.resource://com.example.uas/drawable/mouse",
             "Electronics"
         ),
         Product(
