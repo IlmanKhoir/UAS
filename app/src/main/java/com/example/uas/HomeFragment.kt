@@ -41,7 +41,6 @@ class HomeFragment : Fragment() {
             Category("All", R.drawable.tool),
             Category("Electronics", R.drawable.icons8electronics100),
             Category("Fashion", R.drawable.iconfashion),
-            // Category("Home", R.drawable.icon_home), // Removed as requested
             Category("Beauty", R.drawable.iconslipstick),
             Category("Sports", R.drawable.iconsports)
         )

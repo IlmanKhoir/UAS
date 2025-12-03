@@ -25,5 +25,5 @@ data class OrderEntity(
     val shipping_address: String?,
     val payment_method: String?,
     val tracking_number: String?,
-    val items_json: String // JSON string for items
+    val items_json: String
 )
