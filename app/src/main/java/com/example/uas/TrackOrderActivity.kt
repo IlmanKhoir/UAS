@@ -273,6 +273,7 @@ class TrackOrderActivity : AppCompatActivity() {
     }
 
     private fun getOSRMRoute(start: GeoPoint, end: GeoPoint): List<GeoPoint> {
+        //request untuk mengambil rute dari server OSRM dan ini harus online karena kita harus mengambil data dari server OSRM.
         val urlString = "https://router.project-osrm.org/route/v1/driving/${start.longitude},${start.latitude};${end.longitude},${end.latitude}?overview=full&geometries=geojson"
         
         val url = URL(urlString)
