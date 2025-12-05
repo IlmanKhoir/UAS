@@ -101,28 +101,26 @@ class EditProfileActivity : AppCompatActivity() {
     }
 
     private fun loadUserData() {
-        lifecycleScope.launch {
-            val db = AppDatabase.getDatabase(applicationContext)
-            val userId = sessionManager.getUserId()
-            currentUser = db.userDao().getUserById(userId)
-
-            currentUser?.let { user ->
-                etName.setText(user.name)
-                etEmail.setText(user.email)
-                etPhone.setText(user.phone)
-                etAddress.setText(user.address)
-                
-                if (user.profile_picture_uri != null) {
-                    try {
-                        val uri = user.profile_picture_uri.toUri()
-                        ivProfileImage.setImageURI(uri)
-                        selectedImageUri = uri
-                    } catch (_: Exception) {
-                        // Failed to load image
-                    }
+        val email = sessionManager.getEmail() ?: return
+        
+        ApiClient.instance.getUser(email).enqueue(object : retrofit2.Callback<com.example.uas.data.remote.UserResponse> {
+            override fun onResponse(
+                call: retrofit2.Call<com.example.uas.data.remote.UserResponse>,
+                response: retrofit2.Response<com.example.uas.data.remote.UserResponse>
+            ) {
+                if (response.isSuccessful && response.body()?.success == true) {
+                    val user = response.body()!!
+                    etName.setText(user.name)
+                    etEmail.setText(user.email)
+                    etPhone.setText(user.phone)
+                    etAddress.setText(user.address)
                 }
             }
-        }
+
+            override fun onFailure(call: retrofit2.Call<com.example.uas.data.remote.UserResponse>, t: Throwable) {
+                Toast.makeText(this@EditProfileActivity, "Failed to load profile", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     private fun saveProfile() {
@@ -135,25 +133,28 @@ class EditProfileActivity : AppCompatActivity() {
             return
         }
 
-        lifecycleScope.launch {
-            currentUser?.let { user ->
-                val updatedUser = user.copy(
-                    name = name,
-                    phone = phone,
-                    address = address,
-                    profile_picture_uri = selectedImageUri?.toString()
-                )
-                
-                val db = AppDatabase.getDatabase(applicationContext)
-                db.userDao().updateUser(updatedUser)
-                
-                // Update session if needed (name might have changed)
-                sessionManager.createLoginSession(user.id, name, user.email)
-                
-                Toast.makeText(this@EditProfileActivity, getString(R.string.profile_updated), Toast.LENGTH_SHORT).show()
-                finish()
+        val email = sessionManager.getEmail() ?: return
+
+        // Menggunakan API Remote (Railway)
+        ApiClient.instance.updateUser(email, name, phone, address).enqueue(object : retrofit2.Callback<com.example.uas.data.remote.BaseResponse> {
+            override fun onResponse(
+                call: retrofit2.Call<com.example.uas.data.remote.BaseResponse>,
+                response: retrofit2.Response<com.example.uas.data.remote.BaseResponse>
+            ) {
+                if (response.isSuccessful && response.body()?.success == true) {
+                    // Update session
+                    sessionManager.createLoginSession(sessionManager.getUserId(), name, email)
+                    Toast.makeText(this@EditProfileActivity, getString(R.string.profile_updated), Toast.LENGTH_SHORT).show()
+                    finish()
+                } else {
+                    Toast.makeText(this@EditProfileActivity, "Update Failed: ${response.body()?.error}", Toast.LENGTH_SHORT).show()
+                }
             }
-        }
+
+            override fun onFailure(call: retrofit2.Call<com.example.uas.data.remote.BaseResponse>, t: Throwable) {
+                Toast.makeText(this@EditProfileActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     private fun getLocation() {
