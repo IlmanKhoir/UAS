@@ -87,24 +87,26 @@ class RegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Menggunakan API Remote (Railway)
-            ApiClient.instance.register(email, password, name, "", address).enqueue(object : retrofit2.Callback<com.example.uas.data.remote.RegisterResponse> {
-                override fun onResponse(
-                    call: retrofit2.Call<com.example.uas.data.remote.RegisterResponse>,
-                    response: retrofit2.Response<com.example.uas.data.remote.RegisterResponse>
-                ) {
-                    if (response.isSuccessful && response.body()?.success == true) {
-                        Toast.makeText(this@RegisterActivity, "Registration Successful!", Toast.LENGTH_SHORT).show()
-                        finish()
-                    } else {
-                        Toast.makeText(this@RegisterActivity, "Registration Failed: ${response.body()?.error}", Toast.LENGTH_SHORT).show()
-                    }
-                }
+            lifecycleScope.launch {
+                val db = AppDatabase.getDatabase(applicationContext)
+                val existingUser = db.userDao().getUserByEmail(email)
 
-                override fun onFailure(call: retrofit2.Call<com.example.uas.data.remote.RegisterResponse>, t: Throwable) {
-                    Toast.makeText(this@RegisterActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                if (existingUser != null) {
+                    Toast.makeText(this@RegisterActivity, "Email already registered", Toast.LENGTH_SHORT).show()
+                } else {
+                    val newUser = User(
+                        email = email,
+                        name = name,
+                        password_hash = password, // Note: In production, hash this!
+                        address = address,
+                        phone = "", // Add phone field if needed
+                        profile_picture_uri = selectedImageUri?.toString()
+                    )
+                    db.userDao().insertUser(newUser)
+                    Toast.makeText(this@RegisterActivity, "Registration Successful!", Toast.LENGTH_SHORT).show()
+                    finish()
                 }
-            })
+            }
         }
     }
 

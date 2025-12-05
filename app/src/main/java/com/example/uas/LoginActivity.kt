@@ -41,31 +41,18 @@ class LoginActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Menggunakan API Remote (Railway)
-            ApiClient.instance.login(email, password).enqueue(object : retrofit2.Callback<com.example.uas.data.remote.LoginResponse> {
-                override fun onResponse(
-                    call: retrofit2.Call<com.example.uas.data.remote.LoginResponse>,
-                    response: retrofit2.Response<com.example.uas.data.remote.LoginResponse>
-                ) {
-                    if (response.isSuccessful && response.body()?.success == true) {
-                        val body = response.body()!!
-                        // Simpan session
-                        sessionManager.createLoginSession(
-                            body.userId ?: 0,
-                            body.name ?: "",
-                            body.email ?: ""
-                        )
-                        Toast.makeText(this@LoginActivity, "Login Successful", Toast.LENGTH_SHORT).show()
-                        finish()
-                    } else {
-                        Toast.makeText(this@LoginActivity, "Login Failed: ${response.body()?.error}", Toast.LENGTH_SHORT).show()
-                    }
-                }
+            lifecycleScope.launch {
+                val db = AppDatabase.getDatabase(applicationContext)
+                val user = db.userDao().getUserByEmail(email)
 
-                override fun onFailure(call: retrofit2.Call<com.example.uas.data.remote.LoginResponse>, t: Throwable) {
-                    Toast.makeText(this@LoginActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                if (user != null && user.password_hash == password) { // Simple check for demo
+                    sessionManager.createLoginSession(user.id, user.name, user.email)
+                    Toast.makeText(this@LoginActivity, "Login Successful", Toast.LENGTH_SHORT).show()
+                    finish()
+                } else {
+                    Toast.makeText(this@LoginActivity, "Invalid email or password", Toast.LENGTH_SHORT).show()
                 }
-            })
+            }
         }
 
         tvRegister.setOnClickListener {
